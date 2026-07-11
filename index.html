@@ -1362,7 +1362,7 @@
 
     <div id="finalResult">
       <div class="finalLabel">Код от сейфа</div>
-      <div class="finalCode">1448</div>
+      <div class="finalCode">1148</div>
       <div class="finalText">Код собран. Открывай сейф!</div>
     </div>
 
@@ -1432,8 +1432,8 @@
     const mapPoint3 = document.getElementById('mapPoint3');
     const mapPoint4 = document.getElementById('mapPoint4');
 
-    const QUEST_STAGES = ['start','quiz1','phoneTransfer','ivanIntro','camera','digit4','quiz2','quiz2Success','digit1','namesGame','namesQuestion','digit4Third','phoneStage','lastDigitInput','final'];
-    const DIGIT_STAGES = { digit4: 4, digit1: 1, digit4Third: 4 };
+    const QUEST_STAGES = ['start','quiz1','phoneTransfer','ivanIntro','camera','digit1First','quiz2','quiz2Success','digit1','namesGame','namesQuestion','digit4Third','phoneStage','lastDigitInput','final'];
+    const DIGIT_STAGES = { digit1First: 1, digit1: 1, digit4Third: 4 };
 
     function saveProgress(stage) {
       try {
@@ -1461,8 +1461,8 @@
         case 'phoneTransfer': phoneTransfer.classList.add('show'); break;
         case 'ivanIntro': ivanIntro.classList.add('show'); break;
         case 'camera': start(); break;
-        case 'digit4':
-          showDigitResult('4', 'Первая цифра найдена', 'Запомни её. Это первая цифра кода от сейфа', () => {
+        case 'digit1First':
+          showDigitResult('1', 'Первая цифра найдена', 'Запомни её. Это первая цифра кода от сейфа', () => {
             digitResult.classList.remove('show');
             saveProgress('quiz2');
             quizCard2.classList.add('show');
@@ -1760,9 +1760,9 @@
               taskTitle.style.display = 'none';
               checklist.style.display = 'none';
               status.style.display = 'none';
-              questProgress.digits.push(4);
-              saveProgress('digit4');
-              showDigitResult('4', 'Первая цифра найдена', 'Запомни её. Это первая цифра кода от сейфа', () => {
+              questProgress.digits.push(1);
+              saveProgress('digit1First');
+              showDigitResult('1', 'Первая цифра найдена', 'Запомни её. Это первая цифра кода от сейфа', () => {
                 digitResult.classList.remove('show');
                 saveProgress('quiz2');
                 quizCard2.classList.add('show');
