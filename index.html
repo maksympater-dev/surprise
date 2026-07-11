@@ -1306,7 +1306,7 @@
     </div>
 
     <div id="sceneVideoScreen">
-      <video id="sceneVideoEl" playsinline muted preload="metadata"></video>
+      <video id="sceneVideoEl" playsinline preload="metadata"></video>
       <button id="sceneVideoPlayBtn" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:18px 48px;font-size:20px;font-weight:600;color:#000;background:#fff;border:none;border-radius:999px;cursor:pointer;z-index:5;display:none;">Воспроизвести</button>
     </div>
 
@@ -1536,11 +1536,14 @@
     let mapContinueAction = null;
 
     function playSceneVideo(src) {
+      sceneVideoEl.pause();
       sceneVideoScreen.classList.add('show');
       sceneVideoEl.src = src;
+      sceneVideoEl.load();
       sceneVideoPlayBtn.style.display = 'block';
       sceneVideoPlayBtn.onclick = () => {
         sceneVideoPlayBtn.style.display = 'none';
+        sceneVideoEl.muted = false;
         sceneVideoEl.play().catch(e => console.error('Video play failed:', e));
       };
     }
