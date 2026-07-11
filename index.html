@@ -1362,7 +1362,7 @@
 
     <div id="finalResult">
       <div class="finalLabel">Код от сейфа</div>
-      <div class="finalCode">1148</div>
+      <div class="finalCode">1448</div>
       <div class="finalText">Код собран. Открывай сейф!</div>
     </div>
 
@@ -1432,8 +1432,8 @@
     const mapPoint3 = document.getElementById('mapPoint3');
     const mapPoint4 = document.getElementById('mapPoint4');
 
-    const QUEST_STAGES = ['start','quiz1','phoneTransfer','ivanIntro','camera','digit1First','quiz2','quiz2Success','digit1','namesGame','namesQuestion','digit4Third','phoneStage','lastDigitInput','final'];
-    const DIGIT_STAGES = { digit1First: 1, digit1: 1, digit4Third: 4 };
+    const QUEST_STAGES = ['start','quiz1','phoneTransfer','ivanIntro','camera','digit1First','quiz2','quiz2Success','digit4Second','namesGame','namesQuestion','digit4Third','phoneStage','lastDigitInput','final'];
+    const DIGIT_STAGES = { digit1First: 1, digit4Second: 4, digit4Third: 4 };
 
     function saveProgress(stage) {
       try {
@@ -1471,8 +1471,8 @@
           break;
         case 'quiz2': quizCard2.classList.add('show'); setTimeout(() => quiz2Input.focus(), 500); break;
         case 'quiz2Success': quiz2Success.classList.add('show'); break;
-        case 'digit1':
-          showDigitResult('1', 'Вторая цифра найдена', 'Такой ценитель среди друзей один. Это вторая цифра кода от сейфа', () => {
+        case 'digit4Second':
+          showDigitResult('4', 'Вторая цифра найдена', 'Такой ценитель среди друзей один. Это вторая цифра кода от сейфа', () => {
             digitResult.classList.remove('show');
             mapPoint2.classList.add('done');
             mapPoint2.classList.remove('current');
@@ -1894,9 +1894,9 @@
 
     quiz2NextBtn.addEventListener('click', () => {
       quiz2Success.classList.remove('show');
-      questProgress.digits.push(1);
-      saveProgress('digit1');
-      showDigitResult('1', 'Вторая цифра найдена', 'Такой ценитель среди друзей один. Это вторая цифра кода от сейфа', () => {
+      questProgress.digits.push(4);
+      saveProgress('digit4Second');
+      showDigitResult('4', 'Вторая цифра найдена', 'Такой ценитель среди друзей один. Это вторая цифра кода от сейфа', () => {
         digitResult.classList.remove('show');
         mapPoint2.classList.add('done');
         mapPoint2.classList.remove('current');
