@@ -4,3 +4,6 @@ cloudflared.exe
 tunnel.err
 tunnel.log
 .DS_Store
+
+.vercel
+.env*
