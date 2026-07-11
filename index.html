@@ -630,6 +630,15 @@
       animation: slideUp 0.6s ease-out 1.8s forwards;
     }
     #digitResult .digitBtn:active { transform: scale(0.96); }
+    #digitResult .codeIndicator {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 8px;
+      color: rgba(255,215,0,0.8);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: slideUp 0.6s ease-out 2.2s forwards;
+    }
 
     #mapScreen {
       position: absolute;
@@ -1297,13 +1306,14 @@
     </div>
 
     <div id="sceneVideoScreen">
-      <video id="sceneVideoEl" playsinline></video>
+      <video id="sceneVideoEl" playsinline muted preload="metadata"></video>
     </div>
 
     <div id="digitResult">
       <h2>Цифра найдена</h2>
       <div class="bigDigit">4</div>
       <div class="digitText">Запомни её. Она является частью кода от сейфа</div>
+      <div class="codeIndicator" id="codeIndicator">Код: • • • •</div>
       <button class="digitBtn" id="digitContinueBtn">Продолжить</button>
     </div>
 
@@ -1384,9 +1394,9 @@
     </div>
 
     <div id="startScreen">
-      <h1>Подарок заблокирован</h1>
-      <p>Чтобы открыть поздравление, пройди 4 проверки. Нужна камера. Видео не сохраняется.</p>
-      <button id="startBtn">Начать</button>
+      <h1>Поможем Еве добраться до подарка</h1>
+      <p>Еве предстоит пройти несколько испытаний, найти цифры кода и открыть сейф. Давайте поможем ей пройти весь путь.</p>
+      <button id="startBtn">Начать путешествие</button>
     </div>
   </div>
 
@@ -1450,6 +1460,78 @@
     const mapPoint3 = document.getElementById('mapPoint3');
     const mapPoint4 = document.getElementById('mapPoint4');
 
+    const QUEST_STAGES = ['start','quiz1','phoneTransfer','ivanIntro','camera','digit4','ushkiVideo','quiz2','quiz2Success','digit1','namesGame','namesQuestion','digit4Third','phoneStage','lastDigitInput','final'];
+    const DIGIT_STAGES = { digit4: 4, digit1: 1, digit4Third: 4 };
+
+    function saveProgress(stage) {
+      try {
+        const data = { stage, digits: questProgress.digits };
+        localStorage.setItem('evaQuest', JSON.stringify(data));
+      } catch(e) {}
+    }
+
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem('evaQuest');
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch(e) { return null; }
+    }
+
+    function restoreStage() {
+      const saved = loadProgress();
+      if (!saved || saved.stage === 'start' || !QUEST_STAGES.includes(saved.stage)) return;
+      if (saved.digits && Array.isArray(saved.digits)) questProgress.digits = saved.digits;
+      const stage = saved.stage;
+      startScreen.style.display = 'none';
+      switch(stage) {
+        case 'quiz1': quizCard.classList.add('show'); setTimeout(() => quizInput.focus(), 500); break;
+        case 'phoneTransfer': phoneTransfer.classList.add('show'); break;
+        case 'ivanIntro': ivanIntro.classList.add('show'); break;
+        case 'camera': start(); break;
+        case 'digit4':
+          showDigitResult('4', 'Первая цифра найдена', 'Запомни её. Это первая цифра кода от сейфа', () => {
+            digitResult.classList.remove('show');
+            sceneVideoScreen.classList.add('show');
+            sceneVideoEl.src = 'scenes/USHKI.mp4';
+            sceneVideoEl.play().catch(e => console.error('Video play failed:', e));
+          });
+          break;
+        case 'ushkiVideo':
+          sceneVideoScreen.classList.add('show');
+          sceneVideoEl.src = 'scenes/USHKI.mp4';
+          sceneVideoEl.play().catch(e => console.error('Video play failed:', e));
+          break;
+        case 'quiz2': quizCard2.classList.add('show'); setTimeout(() => quiz2Input.focus(), 500); break;
+        case 'quiz2Success': quiz2Success.classList.add('show'); break;
+        case 'digit1':
+          showDigitResult('1', 'Вторая цифра найдена', 'Такой ценитель среди друзей один. Это вторая цифра кода от сейфа', () => {
+            digitResult.classList.remove('show');
+            mapPoint2.classList.add('done');
+            mapPoint2.classList.remove('current');
+            mapPoint3.classList.add('current');
+            mapContinueAction = () => { mapScreen.classList.remove('show'); startNamesGame(); };
+            mapScreen.classList.add('show');
+          });
+          break;
+        case 'namesGame': startNamesGame(); break;
+        case 'namesQuestion': namesQuestion.classList.add('show'); setTimeout(() => namesAnswerInput.focus(), 500); break;
+        case 'digit4Third':
+          showDigitResult('4', 'Третья цифра найдена', 'В каждом имени по четыре буквы. Это третья цифра кода от сейфа', () => {
+            digitResult.classList.remove('show');
+            mapPoint3.classList.add('done');
+            mapPoint3.classList.remove('current');
+            mapPoint4.classList.add('current');
+            mapContinueAction = () => { mapScreen.classList.remove('show'); phoneStage.classList.add('show'); spawnParticles(); };
+            mapScreen.classList.add('show');
+          });
+          break;
+        case 'phoneStage': phoneStage.classList.add('show'); break;
+        case 'lastDigitInput': lastDigitInput.classList.add('show'); setTimeout(() => lastDigitField.focus(), 500); break;
+        case 'final': finalResult.classList.add('show'); break;
+      }
+    }
+
     const questProgress = { digits: [] };
     let cameraStream = null;
     let quiz2WrongCount = 0;
@@ -1461,10 +1543,14 @@
       const h2 = digitResult.querySelector('h2');
       const bigD = digitResult.querySelector('.bigDigit');
       const dt = digitResult.querySelector('.digitText');
+      const ci = document.getElementById('codeIndicator');
       h2.textContent = title;
       bigD.textContent = digit;
       dt.textContent = text;
-      [h2, bigD, dt, digitContinueBtn].forEach(el => {
+      const slots = ['•', '•', '•', '•'];
+      questProgress.digits.forEach((d, i) => { if (i < 4) slots[i] = d; });
+      ci.textContent = 'Код: ' + slots.join(' ');
+      [h2, bigD, dt, ci, digitContinueBtn].forEach(el => {
         el.style.animation = 'none';
         void el.offsetWidth;
         el.style.animation = '';
@@ -1706,9 +1792,15 @@
               taskTitle.style.display = 'none';
               checklist.style.display = 'none';
               status.style.display = 'none';
-              sceneVideoScreen.classList.add('show');
-              sceneVideoEl.src = 'scenes/SCENE4.mp4';
-              sceneVideoEl.play();
+              questProgress.digits.push(4);
+              saveProgress('digit4');
+              showDigitResult('4', 'Первая цифра найдена', 'Запомни её. Это первая цифра кода от сейфа', () => {
+                digitResult.classList.remove('show');
+                saveProgress('ushkiVideo');
+                sceneVideoScreen.classList.add('show');
+                sceneVideoEl.src = 'scenes/USHKI.mp4';
+                sceneVideoEl.play().catch(e => console.error('Video play failed:', e));
+              });
             }, 700);
             return;
           } else {
@@ -1728,6 +1820,7 @@
       startScreen.style.opacity = '0';
       setTimeout(() => {
         startScreen.style.display = 'none';
+        saveProgress('quiz1');
         quizCard.classList.add('show');
         setTimeout(() => quizInput.focus(), 500);
       }, 500);
@@ -1748,6 +1841,7 @@
         setTimeout(() => {
           quizCard.classList.remove('show');
           quizCard.style.display = 'none';
+          saveProgress('phoneTransfer');
           phoneTransfer.classList.add('show');
         }, 500);
       } else {
@@ -1769,6 +1863,7 @@
 
     phoneTransferBtn.addEventListener('click', () => {
       phoneTransfer.classList.remove('show');
+      saveProgress('ivanIntro');
       ivanIntro.classList.add('show');
     });
 
@@ -1776,28 +1871,17 @@
       ivanAcceptBtn.disabled = true;
       ivanAcceptBtn.textContent = 'Загрузка...';
       ivanIntro.classList.remove('show');
+      saveProgress('camera');
       start();
     });
 
     sceneVideoEl.addEventListener('ended', () => {
       const src = sceneVideoEl.src;
       sceneVideoScreen.classList.remove('show');
-      if (src.includes('SCENE4')) {
-        questProgress.digits.push(4);
-        showDigitResult('4', 'Цифра найдена', 'Запомни её. Она является частью кода от сейфа', () => {
-          digitResult.classList.remove('show');
-          mapPoint1.classList.add('done');
-          mapPoint1.classList.remove('current');
-          mapPoint2.classList.add('current');
-          mapContinueAction = () => {
-            mapScreen.classList.remove('show');
-            sceneVideoScreen.classList.add('show');
-            sceneVideoEl.src = 'scenes/scene 1.mp4';
-            sceneVideoEl.play();
-          };
-          mapScreen.classList.add('show');
-        });
-      } else if (src.includes('scene%201.mp4') || src.includes('scene 1.mp4')) {
+      sceneVideoEl.removeAttribute('src');
+      sceneVideoEl.load();
+      if (src.includes('USHKI')) {
+        saveProgress('quiz2');
         quizCard2.classList.add('show');
         setTimeout(() => quiz2Input.focus(), 500);
       }
@@ -1821,6 +1905,7 @@
         setTimeout(() => {
           quizCard2.classList.remove('show');
           quizCard2.style.opacity = '';
+          saveProgress('quiz2Success');
           quiz2Success.classList.add('show');
           spawnParticles();
         }, 500);
@@ -1854,13 +1939,15 @@
     quiz2NextBtn.addEventListener('click', () => {
       quiz2Success.classList.remove('show');
       questProgress.digits.push(1);
-      showDigitResult('1', 'Цифра найдена', 'Такой ценитель среди друзей один. Она является частью кода от сейфа', () => {
+      saveProgress('digit1');
+      showDigitResult('1', 'Вторая цифра найдена', 'Такой ценитель среди друзей один. Это вторая цифра кода от сейфа', () => {
         digitResult.classList.remove('show');
         mapPoint2.classList.add('done');
         mapPoint2.classList.remove('current');
         mapPoint3.classList.add('current');
         mapContinueAction = () => {
           mapScreen.classList.remove('show');
+          saveProgress('namesGame');
           startNamesGame();
         };
         mapScreen.classList.add('show');
@@ -2000,13 +2087,15 @@
         namesAnswerMsg.textContent = '';
         namesQuestion.classList.remove('show');
         questProgress.digits.push(4);
-        showDigitResult('4', 'Третья цифра кода', 'В каждом имени по четыре буквы. Запомни эту цифру', () => {
+        saveProgress('digit4Third');
+        showDigitResult('4', 'Третья цифра найдена', 'В каждом имени по четыре буквы. Это третья цифра кода от сейфа', () => {
           digitResult.classList.remove('show');
           mapPoint3.classList.add('done');
           mapPoint3.classList.remove('current');
           mapPoint4.classList.add('current');
           mapContinueAction = () => {
             mapScreen.classList.remove('show');
+            saveProgress('phoneStage');
             phoneStage.classList.add('show');
             spawnParticles();
           };
@@ -2024,6 +2113,7 @@
 
     knownDigitBtn.addEventListener('click', () => {
       phoneStage.classList.remove('show');
+      saveProgress('lastDigitInput');
       lastDigitInput.classList.add('show');
       setTimeout(() => lastDigitField.focus(), 500);
     });
@@ -2039,6 +2129,7 @@
         lastDigitMsg.textContent = '';
         lastDigitInput.classList.remove('show');
         questProgress.digits.push(8);
+        saveProgress('final');
         finalResult.classList.add('show');
         spawnParticles();
       } else {
@@ -2050,6 +2141,8 @@
     lastDigitField.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') checkLastDigit();
     });
+
+    restoreStage();
   </script>
 </body>
 </html>
