@@ -546,30 +546,6 @@
     #ivanIntro .transferBtn:active { transform: scale(0.96); }
     #ivanIntro .transferBtn:disabled { opacity: 0.5; cursor: wait; }
 
-    #sceneVideoScreen {
-      position: absolute;
-      inset: 0;
-      background: #000;
-      z-index: 28;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #sceneVideoScreen.show {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    #sceneVideoEl {
-      max-width: 100%;
-      max-height: 100%;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-    }
-
     #digitResult {
       position: absolute;
       inset: 0;
@@ -1305,10 +1281,6 @@
       <button class="transferBtn" id="ivanAcceptBtn">Да, я помогу Еве</button>
     </div>
 
-    <div id="sceneVideoScreen">
-      <video id="sceneVideoEl" playsinline preload="metadata"></video>
-      <button id="sceneVideoPlayBtn" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:18px 48px;font-size:20px;font-weight:600;color:#000;background:#fff;border:none;border-radius:999px;cursor:pointer;z-index:5;display:none;">Воспроизвести</button>
-    </div>
 
     <div id="digitResult">
       <h2>Цифра найдена</h2>
@@ -1424,9 +1396,7 @@
     const phoneTransferBtn = document.getElementById('phoneTransferBtn');
     const ivanIntro = document.getElementById('ivanIntro');
     const ivanAcceptBtn = document.getElementById('ivanAcceptBtn');
-    const sceneVideoScreen = document.getElementById('sceneVideoScreen');
-    const sceneVideoEl = document.getElementById('sceneVideoEl');
-    const sceneVideoPlayBtn = document.getElementById('sceneVideoPlayBtn');
+
     const digitResult = document.getElementById('digitResult');
     const digitContinueBtn = document.getElementById('digitContinueBtn');
     const mapScreen = document.getElementById('mapScreen');
@@ -1462,7 +1432,7 @@
     const mapPoint3 = document.getElementById('mapPoint3');
     const mapPoint4 = document.getElementById('mapPoint4');
 
-    const QUEST_STAGES = ['start','quiz1','phoneTransfer','ivanIntro','camera','digit4','ushkiVideo','quiz2','quiz2Success','digit1','namesGame','namesQuestion','digit4Third','phoneStage','lastDigitInput','final'];
+    const QUEST_STAGES = ['start','quiz1','phoneTransfer','ivanIntro','camera','digit4','quiz2','quiz2Success','digit1','namesGame','namesQuestion','digit4Third','phoneStage','lastDigitInput','final'];
     const DIGIT_STAGES = { digit4: 4, digit1: 1, digit4Third: 4 };
 
     function saveProgress(stage) {
@@ -1494,11 +1464,10 @@
         case 'digit4':
           showDigitResult('4', 'Первая цифра найдена', 'Запомни её. Это первая цифра кода от сейфа', () => {
             digitResult.classList.remove('show');
-            playSceneVideo('scenes/USHKI.mp4');
+            saveProgress('quiz2');
+            quizCard2.classList.add('show');
+            setTimeout(() => quiz2Input.focus(), 500);
           });
-          break;
-        case 'ushkiVideo':
-          playSceneVideo('scenes/USHKI.mp4');
           break;
         case 'quiz2': quizCard2.classList.add('show'); setTimeout(() => quiz2Input.focus(), 500); break;
         case 'quiz2Success': quiz2Success.classList.add('show'); break;
@@ -1535,18 +1504,6 @@
     let quiz2WrongCount = 0;
     let mapContinueAction = null;
 
-    function playSceneVideo(src) {
-      sceneVideoEl.pause();
-      sceneVideoScreen.classList.add('show');
-      sceneVideoEl.src = src;
-      sceneVideoEl.load();
-      sceneVideoPlayBtn.style.display = 'block';
-      sceneVideoPlayBtn.onclick = () => {
-        sceneVideoPlayBtn.style.display = 'none';
-        sceneVideoEl.muted = false;
-        sceneVideoEl.play().catch(e => console.error('Video play failed:', e));
-      };
-    }
 
     function showDigitResult(digit, title, text, continueHandler) {
       digitResult.classList.remove('show');
@@ -1807,8 +1764,9 @@
               saveProgress('digit4');
               showDigitResult('4', 'Первая цифра найдена', 'Запомни её. Это первая цифра кода от сейфа', () => {
                 digitResult.classList.remove('show');
-                saveProgress('ushkiVideo');
-                playSceneVideo('scenes/USHKI.mp4');
+                saveProgress('quiz2');
+                quizCard2.classList.add('show');
+                setTimeout(() => quiz2Input.focus(), 500);
               });
             }, 700);
             return;
@@ -1884,18 +1842,6 @@
       start();
     });
 
-    sceneVideoEl.addEventListener('ended', () => {
-      const src = sceneVideoEl.src;
-      sceneVideoScreen.classList.remove('show');
-      sceneVideoPlayBtn.style.display = 'none';
-      sceneVideoEl.removeAttribute('src');
-      sceneVideoEl.load();
-      if (src.includes('USHKI')) {
-        saveProgress('quiz2');
-        quizCard2.classList.add('show');
-        setTimeout(() => quiz2Input.focus(), 500);
-      }
-    });
 
     mapContinueBtn.addEventListener('click', () => {
       if (mapContinueAction) mapContinueAction();
