@@ -83,6 +83,7 @@
       padding: 24px;
       background: linear-gradient(180deg, #1a0033 0%, #000 100%);
       z-index: 20;
+      transition: opacity 0.5s;
     }
     #startScreen h1 {
       font-size: 28px;
@@ -383,6 +384,122 @@
       left: 50%;
       box-shadow: 0 0 10px #ffd700;
     }
+
+    #quizCard {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(180deg, #1a0033 0%, #000 100%);
+      z-index: 22;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    #quizCard.show {
+      opacity: 1;
+      pointer-events: auto;
+}
+    #quizCard h2 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    #quizCard .question {
+      font-size: 17px;
+      opacity: 0.85;
+      margin-bottom: 28px;
+      line-height: 1.5;
+      max-width: 340px;
+    }
+    #quizCard input {
+      width: 100%;
+      max-width: 300px;
+      padding: 16px 20px;
+      font-size: 18px;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.25);
+      border-radius: 14px;
+      text-align: center;
+      outline: none;
+      margin-bottom: 16px;
+      -webkit-appearance: none;
+    }
+    #quizCard input::placeholder { color: rgba(255,255,255,0.4); }
+    #quizCard input:focus { border-color: rgba(255,255,255,0.5); }
+    #quizCard .quizBtn {
+      padding: 16px 48px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #000;
+      background: #fff;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    #quizCard .quizBtn:active { transform: scale(0.96); }
+    #quizCard .quizMsg {
+      margin-top: 18px;
+      font-size: 15px;
+      min-height: 20px;
+      max-width: 320px;
+      line-height: 1.5;
+      transition: opacity 0.2s;
+    }
+    #quizCard .quizMsg.error { color: #f87171; }
+
+    #phoneTransfer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(180deg, #0a0015 0%, #1a0033 50%, #000 100%);
+      z-index: 23;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s;
+    }
+    #phoneTransfer.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #phoneTransfer h2 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    #phoneTransfer p {
+      font-size: 17px;
+      opacity: 0.85;
+      margin-bottom: 32px;
+      line-height: 1.5;
+      max-width: 340px;
+    }
+    #phoneTransfer .transferBtn {
+      padding: 18px 48px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #000;
+      background: #4ade80;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    #phoneTransfer .transferBtn:active { transform: scale(0.96); }
+    #phoneTransfer .transferBtn:disabled { opacity: 0.5; cursor: wait; }
   </style>
 </head>
 <body>
@@ -412,6 +529,20 @@
     </div>
     <div class="particles" id="particles"></div>
 
+    <div id="quizCard">
+      <h2>Первое испытание</h2>
+      <div class="question">Кто из твоих новых друзей однажды выпил 14 литров пива?</div>
+      <input type="text" id="quizInput" placeholder="Введи имя" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="quizBtn" id="quizCheckBtn">Проверить</button>
+      <div class="quizMsg" id="quizMsg"></div>
+    </div>
+
+    <div id="phoneTransfer">
+      <h2>Верно, это Иван</h2>
+      <p>Теперь передай телефон Ивану. Следующее испытание должен пройти именно он.</p>
+      <button class="transferBtn" id="phoneTransferBtn">Телефон у Ивана</button>
+    </div>
+
     <div id="startScreen">
       <h1>Подарок заблокирован</h1>
       <p>Чтобы открыть поздравление, пройди 4 проверки. Нужна камера. Видео не сохраняется.</p>
@@ -434,6 +565,12 @@
     const startBtn = document.getElementById('startBtn');
     const taskTitle = document.getElementById('taskTitle');
     const progress = document.getElementById('progress');
+    const quizCard = document.getElementById('quizCard');
+    const quizInput = document.getElementById('quizInput');
+    const quizCheckBtn = document.getElementById('quizCheckBtn');
+    const quizMsg = document.getElementById('quizMsg');
+    const phoneTransfer = document.getElementById('phoneTransfer');
+    const phoneTransferBtn = document.getElementById('phoneTransferBtn');
 
     let faceLandmarker;
     let handLandmarker;
@@ -585,6 +722,7 @@
         window.addEventListener('resize', resizeCanvas);
 
         startScreen.style.display = 'none';
+        phoneTransfer.classList.remove('show');
         taskTitle.textContent = 'Сделай всё одновременно';
         taskTitle.style.display = 'block';
         renderChecklist();
@@ -593,6 +731,8 @@
       } catch (err) {
         startBtn.disabled = false;
         startBtn.textContent = 'Начать';
+        phoneTransferBtn.disabled = false;
+        phoneTransferBtn.textContent = 'Телефон у Ивана';
         setStatus('Ошибка: ' + err.message, 'error');
         console.error(err);
       }
@@ -672,7 +812,54 @@
       requestAnimationFrame(predict);
     }
 
-    startBtn.addEventListener('click', start);
+    startBtn.addEventListener('click', () => {
+      startScreen.style.opacity = '0';
+      setTimeout(() => {
+        startScreen.style.display = 'none';
+        quizCard.classList.add('show');
+        setTimeout(() => quizInput.focus(), 500);
+      }, 500);
+    });
+
+    function checkQuiz() {
+      const raw = quizInput.value;
+      const answer = raw.trim().toLowerCase();
+      quizMsg.className = 'quizMsg';
+      if (answer === '') {
+        quizMsg.textContent = 'Сначала введи имя';
+        quizMsg.classList.add('error');
+        return;
+      }
+      if (answer === 'иван') {
+        quizMsg.textContent = '';
+        quizCard.style.opacity = '0';
+        setTimeout(() => {
+          quizCard.classList.remove('show');
+          quizCard.style.display = 'none';
+          phoneTransfer.classList.add('show');
+        }, 500);
+      } else {
+        quizMsg.textContent = 'Не угадала. Этот человек явно очень серьёзно подошёл к знакомству с пивом';
+        quizMsg.classList.add('error');
+      }
+    }
+
+    quizCheckBtn.addEventListener('click', checkQuiz);
+    quizInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkQuiz();
+    });
+    quizInput.addEventListener('input', () => {
+      if (quizMsg.textContent) {
+        quizMsg.textContent = '';
+        quizMsg.className = 'quizMsg';
+      }
+    });
+
+    phoneTransferBtn.addEventListener('click', () => {
+      phoneTransferBtn.disabled = true;
+      phoneTransferBtn.textContent = 'Загрузка...';
+      start();
+    });
   </script>
 </body>
 </html>
