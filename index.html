@@ -500,6 +500,385 @@
     }
     #phoneTransfer .transferBtn:active { transform: scale(0.96); }
     #phoneTransfer .transferBtn:disabled { opacity: 0.5; cursor: wait; }
+    #ivanIntro {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(180deg, #0a0015 0%, #1a0033 50%, #000 100%);
+      z-index: 24;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s;
+    }
+    #ivanIntro.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #ivanIntro h2 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    #ivanIntro p {
+      font-size: 17px;
+      opacity: 0.85;
+      margin-bottom: 32px;
+      line-height: 1.5;
+      max-width: 340px;
+    }
+    #ivanIntro .transferBtn {
+      padding: 18px 48px;
+      font-size: 20px;
+      font-weight: 600;
+      color: #000;
+      background: #4ade80;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    #ivanIntro .transferBtn:active { transform: scale(0.96); }
+    #ivanIntro .transferBtn:disabled { opacity: 0.5; cursor: wait; }
+
+    #sceneVideoScreen {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      z-index: 28;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #sceneVideoScreen.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #sceneVideoEl {
+      max-width: 100%;
+      max-height: 100%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #digitResult {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(180deg, #0a0015 0%, #1a0033 50%, #000 100%);
+      z-index: 27;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s;
+    }
+    #digitResult.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #digitResult h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+      opacity: 0;
+      animation: slideUp 0.6s ease-out 0.3s forwards;
+    }
+    #digitResult .bigDigit {
+      font-size: 140px;
+      font-weight: 800;
+      color: #4ade80;
+      text-shadow: 0 0 60px rgba(74,222,128,0.8);
+      opacity: 0;
+      transform: scale(3) rotate(-45deg);
+      filter: blur(20px);
+      animation: digitLock 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s forwards;
+      margin-bottom: 20px;
+    }
+    #digitResult .digitText {
+      font-size: 17px;
+      opacity: 0;
+      line-height: 1.5;
+      max-width: 340px;
+      margin-bottom: 32px;
+      animation: slideUp 0.6s ease-out 1.4s forwards;
+    }
+    #digitResult .digitBtn {
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #000;
+      background: #4ade80;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s;
+      opacity: 0;
+      animation: slideUp 0.6s ease-out 1.8s forwards;
+    }
+    #digitResult .digitBtn:active { transform: scale(0.96); }
+
+    #mapScreen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(180deg, #0a0015 0%, #1a0033 50%, #000 100%);
+      z-index: 26;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s;
+    }
+    #mapScreen.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #mapScreen h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 32px;
+      letter-spacing: -0.5px;
+    }
+    #mapScreen .mapPoints {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+    #mapScreen .mapPoint {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 18px;
+      opacity: 0.4;
+      transition: all 0.4s;
+    }
+    #mapScreen .mapPoint.done {
+      opacity: 1;
+      color: #4ade80;
+    }
+    #mapScreen .mapPoint .mapDot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid rgba(255,255,255,0.3);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      transition: all 0.4s;
+    }
+    #mapScreen .mapPoint.done .mapDot {
+      background: #22c55e;
+      border-color: #22c55e;
+    }
+    #mapScreen .mapPoint.current .mapDot {
+      border-color: #3b82f6;
+      animation: pulseBlue 1.5s ease-in-out infinite;
+    }
+    @keyframes pulseBlue {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); }
+      50% { box-shadow: 0 0 0 8px rgba(59,130,246,0); }
+    }
+    #mapScreen .mapBtn {
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #000;
+      background: #fff;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    #mapScreen .mapBtn:active { transform: scale(0.96); }
+
+    #quizCard2 {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(180deg, #1a0033 0%, #000 100%);
+      z-index: 22;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    #quizCard2.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #quizCard2 h2 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+    #quizCard2 .question {
+      font-size: 17px;
+      opacity: 0.85;
+      margin-bottom: 28px;
+      line-height: 1.5;
+      max-width: 340px;
+    }
+    #quizCard2 input {
+      width: 100%;
+      max-width: 300px;
+      padding: 16px 20px;
+      font-size: 18px;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.25);
+      border-radius: 14px;
+      text-align: center;
+      outline: none;
+      margin-bottom: 16px;
+      -webkit-appearance: none;
+    }
+    #quizCard2 input::placeholder { color: rgba(255,255,255,0.4); }
+    #quizCard2 input:focus { border-color: rgba(255,255,255,0.5); }
+    #quizCard2 .quizBtn {
+      padding: 16px 48px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #000;
+      background: #fff;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    #quizCard2 .quizBtn:active { transform: scale(0.96); }
+    #quizCard2 .hintBtn {
+      margin-top: 16px;
+      padding: 8px 24px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #quizCard2 .hintBtn:active { transform: scale(0.96); }
+    #quizCard2 .hintText {
+      margin-top: 14px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      max-width: 320px;
+      line-height: 1.5;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #quizCard2 .hintText.show { opacity: 1; }
+    #quizCard2 .quizMsg {
+      margin-top: 18px;
+      font-size: 15px;
+      min-height: 20px;
+      max-width: 320px;
+      line-height: 1.5;
+      transition: opacity 0.2s;
+    }
+    #quizCard2 .quizMsg.error { color: #f87171; }
+
+    #quiz2Success {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(180deg, #0a0015 0%, #1a0033 50%, #000 100%);
+      z-index: 27;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s;
+    }
+    #quiz2Success.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #quiz2Success h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+      opacity: 0;
+      animation: slideUp 0.6s ease-out 0.3s forwards;
+    }
+    #quiz2Success .successMsg {
+      font-size: 17px;
+      opacity: 0;
+      line-height: 1.5;
+      max-width: 340px;
+      margin-bottom: 32px;
+      animation: slideUp 0.6s ease-out 0.6s forwards;
+    }
+    #quiz2Success .nextBtn2 {
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #000;
+      background: #4ade80;
+      border: none;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: transform 0.15s;
+      opacity: 0;
+      animation: slideUp 0.6s ease-out 1s forwards;
+    }
+    #quiz2Success .nextBtn2:active { transform: scale(0.96); }
+
+    #stage3Stub {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      background: linear-gradient(180deg, #1a0033 0%, #000 100%);
+      z-index: 26;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s;
+    }
+    #stage3Stub.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #stage3Stub h2 {
+      font-size: 24px;
+      font-weight: 700;
+      opacity: 0.7;
+      letter-spacing: -0.5px;
+    }
   </style>
 </head>
 <body>
@@ -543,6 +922,54 @@
       <button class="transferBtn" id="phoneTransferBtn">Телефон у Ивана</button>
     </div>
 
+    <div id="ivanIntro">
+      <h2>Иван, теперь всё в твоих руках</h2>
+      <p>Еве нужна твоя помощь. Пожалуйста, помоги ей пройти следующее испытание.</p>
+      <button class="transferBtn" id="ivanAcceptBtn">Да, я помогу Еве</button>
+    </div>
+
+    <div id="sceneVideoScreen">
+      <video id="sceneVideoEl" playsinline></video>
+    </div>
+
+    <div id="digitResult">
+      <h2>Цифра найдена</h2>
+      <div class="bigDigit">4</div>
+      <div class="digitText">Запомни её. Она является частью кода от сейфа</div>
+      <button class="digitBtn" id="digitContinueBtn">Продолжить</button>
+    </div>
+
+    <div id="mapScreen">
+      <h2>Карта квеста</h2>
+      <div class="mapPoints">
+        <div class="mapPoint done" id="mapPoint1"><div class="mapDot">✓</div><span>Первое испытание — Иван</span></div>
+        <div class="mapPoint current" id="mapPoint2"><div class="mapDot">2</div><span>Второе испытание</span></div>
+        <div class="mapPoint" id="mapPoint3"><div class="mapDot">3</div><span>Третье испытание</span></div>
+        <div class="mapPoint" id="mapPoint4"><div class="mapDot">4</div><span>Финал</span></div>
+      </div>
+      <button class="mapBtn" id="mapContinueBtn">Продолжить</button>
+    </div>
+
+    <div id="quizCard2">
+      <h2>Второе испытание</h2>
+      <div class="question">Он не разводит кроликов и не работает в зоопарке. Но костюм с ушками считает очень убедительным аргументом. Кто это?</div>
+      <input type="text" id="quiz2Input" placeholder="Введи имя" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <button class="quizBtn" id="quiz2CheckBtn">Проверить</button>
+      <button class="hintBtn" id="quiz2HintBtn">Нужна подсказка</button>
+      <div class="hintText" id="quiz2HintText"></div>
+      <div class="quizMsg" id="quiz2Msg"></div>
+    </div>
+
+    <div id="quiz2Success">
+      <h2>Верно, это Влад</h2>
+      <div class="successMsg">Его предпочтения наконец-то принесли практическую пользу</div>
+      <button class="nextBtn2" id="quiz2NextBtn">Дальше</button>
+    </div>
+
+    <div id="stage3Stub">
+      <h2>Следующее испытание скоро появится</h2>
+    </div>
+
     <div id="startScreen">
       <h1>Подарок заблокирован</h1>
       <p>Чтобы открыть поздравление, пройди 4 проверки. Нужна камера. Видео не сохраняется.</p>
@@ -571,6 +998,29 @@
     const quizMsg = document.getElementById('quizMsg');
     const phoneTransfer = document.getElementById('phoneTransfer');
     const phoneTransferBtn = document.getElementById('phoneTransferBtn');
+    const ivanIntro = document.getElementById('ivanIntro');
+    const ivanAcceptBtn = document.getElementById('ivanAcceptBtn');
+    const sceneVideoScreen = document.getElementById('sceneVideoScreen');
+    const sceneVideoEl = document.getElementById('sceneVideoEl');
+    const digitResult = document.getElementById('digitResult');
+    const digitContinueBtn = document.getElementById('digitContinueBtn');
+    const mapScreen = document.getElementById('mapScreen');
+    const mapContinueBtn = document.getElementById('mapContinueBtn');
+    const mapPoint1 = document.getElementById('mapPoint1');
+    const mapPoint2 = document.getElementById('mapPoint2');
+    const quizCard2 = document.getElementById('quizCard2');
+    const quiz2Input = document.getElementById('quiz2Input');
+    const quiz2CheckBtn = document.getElementById('quiz2CheckBtn');
+    const quiz2HintBtn = document.getElementById('quiz2HintBtn');
+    const quiz2HintText = document.getElementById('quiz2HintText');
+    const quiz2Msg = document.getElementById('quiz2Msg');
+    const quiz2Success = document.getElementById('quiz2Success');
+    const quiz2NextBtn = document.getElementById('quiz2NextBtn');
+    const stage3Stub = document.getElementById('stage3Stub');
+
+    const questProgress = { digits: [] };
+    let cameraStream = null;
+    let quiz2WrongCount = 0;
 
     let faceLandmarker;
     let handLandmarker;
@@ -714,6 +1164,7 @@
           audio: false
         });
 
+        cameraStream = stream;
         video.srcObject = stream;
         await new Promise(r => video.onloadedmetadata = r);
         await video.play();
@@ -723,6 +1174,7 @@
 
         startScreen.style.display = 'none';
         phoneTransfer.classList.remove('show');
+        ivanIntro.classList.remove('show');
         taskTitle.textContent = 'Сделай всё одновременно';
         taskTitle.style.display = 'block';
         renderChecklist();
@@ -733,6 +1185,8 @@
         startBtn.textContent = 'Начать';
         phoneTransferBtn.disabled = false;
         phoneTransferBtn.textContent = 'Телефон у Ивана';
+        ivanAcceptBtn.disabled = false;
+        ivanAcceptBtn.textContent = 'Да, я помогу Еве';
         setStatus('Ошибка: ' + err.message, 'error');
         console.error(err);
       }
@@ -790,13 +1244,19 @@
           allHoldFrames++;
           if (allHoldFrames >= REQUIRED_HOLD) {
             triggerScreenshot();
+            if (cameraStream) {
+              cameraStream.getTracks().forEach(t => t.stop());
+              cameraStream = null;
+            }
+            video.srcObject = null;
+            canvas.style.display = 'none';
             setTimeout(() => {
-              const resultScreen = document.getElementById('resultScreen');
-              resultScreen.classList.add('show');
               taskTitle.style.display = 'none';
               checklist.style.display = 'none';
               status.style.display = 'none';
-              setTimeout(spawnParticles, 1100);
+              sceneVideoScreen.classList.add('show');
+              sceneVideoEl.src = 'scenes/SCENE4.mp4';
+              sceneVideoEl.play();
             }, 700);
             return;
           } else {
@@ -856,9 +1316,94 @@
     });
 
     phoneTransferBtn.addEventListener('click', () => {
-      phoneTransferBtn.disabled = true;
-      phoneTransferBtn.textContent = 'Загрузка...';
+      phoneTransfer.classList.remove('show');
+      ivanIntro.classList.add('show');
+    });
+
+    ivanAcceptBtn.addEventListener('click', () => {
+      ivanAcceptBtn.disabled = true;
+      ivanAcceptBtn.textContent = 'Загрузка...';
+      ivanIntro.classList.remove('show');
       start();
+    });
+
+    sceneVideoEl.addEventListener('ended', () => {
+      const src = sceneVideoEl.src;
+      sceneVideoScreen.classList.remove('show');
+      if (src.includes('SCENE4')) {
+        questProgress.digits.push(4);
+        digitResult.classList.add('show');
+        spawnParticles();
+      } else if (src.includes('scene%201.mp4') || src.includes('scene 1.mp4')) {
+        quizCard2.classList.add('show');
+        setTimeout(() => quiz2Input.focus(), 500);
+      }
+    });
+
+    digitContinueBtn.addEventListener('click', () => {
+      digitResult.classList.remove('show');
+      mapPoint1.classList.add('done');
+      mapPoint1.classList.remove('current');
+      mapPoint2.classList.add('current');
+      mapScreen.classList.add('show');
+    });
+
+    mapContinueBtn.addEventListener('click', () => {
+      mapScreen.classList.remove('show');
+      sceneVideoScreen.classList.add('show');
+      sceneVideoEl.src = 'scenes/scene 1.mp4';
+      sceneVideoEl.play();
+    });
+
+    function checkQuiz2() {
+      const answer = quiz2Input.value.trim().toLowerCase();
+      quiz2Msg.className = 'quizMsg';
+      if (answer === '') {
+        quiz2Msg.textContent = 'Сначала введи имя';
+        quiz2Msg.classList.add('error');
+        return;
+      }
+      if (answer === 'влад' || answer === 'владик') {
+        quiz2Msg.textContent = '';
+        quizCard2.style.opacity = '0';
+        setTimeout(() => {
+          quizCard2.classList.remove('show');
+          quizCard2.style.opacity = '';
+          quiz2Success.classList.add('show');
+          spawnParticles();
+        }, 500);
+      } else {
+        quiz2WrongCount++;
+        quiz2Msg.textContent = 'Нет. Похоже, ценитель зайчиков всё ещё скрывается среди присутствующих';
+        quiz2Msg.classList.add('error');
+        if (quiz2WrongCount >= 2) {
+          quiz2HintText.textContent = 'Имя начинается на "В"';
+          quiz2HintText.classList.add('show');
+        }
+      }
+    }
+
+    quiz2CheckBtn.addEventListener('click', checkQuiz2);
+    quiz2Input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkQuiz2();
+    });
+    quiz2Input.addEventListener('input', () => {
+      if (quiz2Msg.textContent) {
+        quiz2Msg.textContent = '';
+        quiz2Msg.className = 'quizMsg';
+      }
+    });
+
+    quiz2HintBtn.addEventListener('click', () => {
+      quiz2HintText.textContent = 'Его имя состоит из четырёх букв и начинается на "В"';
+      quiz2HintText.classList.add('show');
+    });
+
+    quiz2NextBtn.addEventListener('click', () => {
+      quiz2Success.classList.remove('show');
+      mapPoint2.classList.add('done');
+      mapPoint2.classList.remove('current');
+      stage3Stub.classList.add('show');
     });
   </script>
 </body>
